@@ -6,5 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-m_calc = "0.1.2"
-eframe = "0.14.0"
+m_calc = "0.1.3"
+eframe = "0.24.0"
