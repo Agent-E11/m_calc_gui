@@ -11,7 +11,8 @@ use eframe::{
         Key,
         Layout,
         Align,
-        Direction
+        Direction,
+        ScrollArea,
     },
 };
 
@@ -78,22 +79,25 @@ impl App for Calculator {
                 ui.set_width(ui.available_width());
             });
 
-            // TODO: Make columns scrollable
             ui.add_space(5.0);
             ui.columns(2, |cols| {
                 cols[0].group(|ui| {
                     ui.heading("History");
-                    for expr in self.history.iter().rev() {
-                        ui.monospace(display_expr(expr));
-                    }
+                    ScrollArea::vertical().id_source("l_scroll").show(ui, |ui| {
+                        for expr in self.history.iter().rev() {
+                            ui.monospace(display_expr(expr));
+                        }
+                    });
                     ui.set_height(ui.available_height());
                 });
                 cols[0].set_min_height(cols[0].available_height());
                 cols[1].group(|ui| {
                     ui.heading("Assignments");
-                    for entry in &self.context {
-                        ui.monospace(format!("{} = {}", entry.0, display_expr(entry.1)));
-                    }
+                    ScrollArea::vertical().id_source("r_scroll").show(ui, |ui| {
+                        for entry in &self.context {
+                            ui.monospace(format!("{} = {}", entry.0, display_expr(entry.1)));
+                        }
+                    });
                     ui.set_height(ui.available_height());
                 });
             });
