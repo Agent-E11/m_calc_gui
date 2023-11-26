@@ -1,3 +1,4 @@
+// TODO: Add `Clear History` and `Clear Assignments` buttons
 use std::collections::HashMap;
 
 use eframe::{
@@ -12,7 +13,7 @@ use eframe::{
         Layout,
         Align,
         Direction,
-        ScrollArea,
+        ScrollArea, TextEdit, vec2,
     },
 };
 
@@ -43,9 +44,10 @@ impl Calculator {
 impl App for Calculator {
     fn update(&mut self, ctx: &Context, frame: &mut Frame) {
         CentralPanel::default().show(ctx, |ui| {
-            ui.horizontal(|ui| { // TODO: Make contents horizontally justified
-                let input = ui.text_edit_singleline(&mut self.input_text);
+            ui.with_layout(Layout::right_to_left(Align::TOP), |ui| {
+
                 let button = ui.button("Calculate");
+                let input = ui.add_sized((ui.available_width(), 0.0), TextEdit::singleline(&mut self.input_text));
                 if button.clicked() || ui.input(|i| i.key_pressed(Key::Enter)) {
                     // Check if the button was clicked _or_ the `Enter` was pressed
                     println!("Input text: `{}`", self.input_text);
@@ -66,11 +68,8 @@ impl App for Calculator {
                         },
                     }
 
-                    // println!("Tokens: `{:?}` (`{}`)", tokens, display_expr(&tokens));
-                    // println!("Result: `{}` (`{}`)", res, display_expr(&vec![res.clone()]));
                     input.request_focus(); // Re-focus after (`Enter` un-focuses)
                 }
-                ui.set_width(ui.available_width());
             });
 
             ui.add_space(5.0);
@@ -94,8 +93,13 @@ impl App for Calculator {
                 cols[1].group(|ui| {
                     ui.heading("Assignments");
                     ScrollArea::vertical().id_source("r_scroll").show(ui, |ui| {
+                        let mut entries: Vec<String> = Vec::new();
                         for entry in &self.context {
-                            ui.monospace(format!("{} = {}", entry.0, display_expr(entry.1)));
+                            entries.push(format!("{} = {}", entry.0, display_expr(entry.1)));
+                        }
+                        entries.sort();
+                        for entry in entries {
+                            ui.monospace(entry);
                         }
                     });
                     ui.set_height(ui.available_height());
